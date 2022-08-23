@@ -1,0 +1,24 @@
+version: '3'
+
+
+services:
+
+
+  postgres1:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=a
+      - PGUSER=a
+      - POSTGRES_NAME=a
+      - POSTGRES_PASSWORD=a
+    ports:
+      - "5430:5432"
+  postgres2:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=b
+      - PGUSER=b
+      - POSTGRES_NAME=b
+      - POSTGRES_PASSWORD=b
+    ports:
+      - "5431:5432"
