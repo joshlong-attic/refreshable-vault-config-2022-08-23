@@ -1,5 +1,6 @@
 package com.example.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -22,28 +23,20 @@ import java.util.Collection;
 @SpringBootApplication
 public class ConfigApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ConfigApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(ConfigApplication.class, args);
+	}
 
-
-    @Bean
-    @RefreshScope
-    DataSource dataSource(
-            DataSourceProperties properties
-            /*
-            @Value("${spring.datasource.url}") String url,
-              @Value("${spring.datasource.username}") String username,
-              @Value("${spring.datasource.password}") String pw
-          */) {
-        return DataSourceBuilder
-                .create()
-                .url(properties.getUrl())
-                .username(properties.getUsername())
-                .password(properties.getPassword())
-                .build();
-    }
-
+	@Bean
+	@RefreshScope
+	DataSource dataSource(DataSourceProperties properties, //
+			@Value("${spring.datasource.url}") String url, //
+			@Value("${spring.datasource.username}") String username, //
+			@Value("${spring.datasource.password}") String pw //
+	) {
+		return DataSourceBuilder.create().url(properties.getUrl()).username(properties.getUsername())
+				.password(properties.getPassword()).build();
+	}
 
 }
 
@@ -53,16 +46,17 @@ record Customer(Integer id, String name) {
 @Repository
 class CustomerRepository {
 
-    private final JdbcTemplate template;
+	private final JdbcTemplate template;
 
-    CustomerRepository(JdbcTemplate template) {
-        this.template = template;
-    }
+	CustomerRepository(JdbcTemplate template) {
+		this.template = template;
+	}
 
-    Collection<Customer> customers() {
-        return this.template.query("select * from customer",
-                (rs, rowNum) -> new Customer(rs.getInt("id"), rs.getString("name")));
-    }
+	Collection<Customer> customers() {
+		return this.template.query("select * from customer",
+				(rs, rowNum) -> new Customer(rs.getInt("id"), rs.getString("name")));
+	}
+
 }
 
 @Controller
@@ -70,23 +64,25 @@ class CustomerRepository {
 @RefreshScope
 class RefreshController {
 
-    private final CustomerRepository repository;
+	private final CustomerRepository repository;
 
-    RefreshController(CustomerRepository repository) {
-        this.repository = repository;
-    }
+	RefreshController(CustomerRepository repository) {
+		this.repository = repository;
+	}
 
-    @GetMapping("/customers")
-    Collection<Customer> get() {
-        return this.repository.customers();
-    }
+	@GetMapping("/customers")
+	Collection<Customer> get() {
+		return this.repository.customers();
+	}
+
 }
 
 @Component
 class RefreshListener {
 
-    @EventListener({ApplicationReadyEvent.class, RefreshScopeRefreshedEvent.class})
-    public void refresh() {
-        System.out.println("the environment's been changed!");
-    }
+	@EventListener({ ApplicationReadyEvent.class, RefreshScopeRefreshedEvent.class })
+	public void refresh() {
+		System.out.println("the environment's been changed!");
+	}
+
 }
